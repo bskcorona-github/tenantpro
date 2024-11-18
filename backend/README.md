@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TenantPro
 
-## Getting Started
+TenantPro is a multi-functional web application designed for managing tenants, products, and inventory, with additional features for order and sales tracking. It leverages modern web technologies like **Next.js**, **Nuxt.js**, **TypeScript**, and **Prisma**, ensuring scalability and maintainability.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Account Management**
+  - Manage user accounts and assign roles (Admin, Owner, etc.).
+- **Tenant Management**
+  - Link multiple tenants to owners for centralized management.
+- **Product Management**
+  - Basic product management including categories, attributes, and images.
+- **Inventory Management**
+  - SKU-based inventory tracking with unit-based attributes (e.g., g, pieces).
+- **Order Management**
+  - Track orders placed by customers.
+- **Sales Management**
+  - View sales data for individual tenants or across all tenants for an owner.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Technologies Used
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend**: [Nuxt.js](https://nuxtjs.org/) (TypeScript)
+- **Backend**: [Next.js](https://nextjs.org/) (TypeScript)
+- **Database**: [MySQL](https://www.mysql.com/) with [Prisma](https://www.prisma.io/)
+- **Authentication**: JWT-based authentication system
+- **Styling**: Tailwind CSS
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Installation
 
-## Learn More
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- [MySQL](https://www.mysql.com/)
 
-To learn more about Next.js, take a look at the following resources:
+### Steps
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/<your-username>/tenantpro.git
+   cd tenantpro
