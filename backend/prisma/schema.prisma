@@ -32,7 +32,10 @@ model Tenant {
   products  Product[] @relation("TenantProducts")
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@unique([ownerId, name]) // 複合一意制約
 }
+
 
 model Product {
   id        Int       @id @default(autoincrement())

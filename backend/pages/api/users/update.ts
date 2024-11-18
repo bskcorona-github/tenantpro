@@ -9,10 +9,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "PUT") {
-    const { id, email, name, role, password } = req.body;
+    const { id, email, name, role, password, tenants } = req.body;
 
     // バリデーション: 必須フィールドの確認
-    if (!id || (!email && !name && !role && !password)) {
+    if (!id || (!email && !name && !role && !password && !tenants)) {
       return res
         .status(400)
         .json({ error: "ID and at least one field to update are required" });
@@ -33,6 +33,21 @@ export default async function handler(
           ...(name && { name }),
           ...(role && { role }),
           ...(password && { password: hashedPassword }),
+          ...(tenants && {
+            tenants: {
+              set: tenants.map((tenant: { id: number; name: string }) => ({
+                id: tenant.id,
+              })), // 既存のテナントを関連付け
+              create: tenants
+                .filter((tenant: { id?: number }) => !tenant.id)
+                .map((tenant: { name: string }) => ({
+                  name: tenant.name,
+                })), // 新しいテナントを作成
+            },
+          }),
+        },
+        include: {
+          tenants: true, // 更新後のテナント情報を含める
         },
       });
 
