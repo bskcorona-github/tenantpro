@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import Cors from "cors";
 
 const prisma = new PrismaClient();
@@ -23,37 +23,29 @@ function runMiddleware(
   });
 }
 
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   await runMiddleware(req, res, cors);
 
-  if (req.method === "DELETE") {
-    const { id } = req.body;
+  const { id } = req.query;
 
-    // バリデーション: 必須フィールドの確認
-    if (!id) {
-      return res.status(400).json({ error: "ID is required" });
-    }
-
+  if (req.method === "GET") {
     try {
-      // テナントの削除
-      const deletedTenant = await prisma.tenant.delete({
+      const product = await prisma.product.findUnique({
         where: { id: Number(id) },
+        include: { tenant: true },
       });
 
-      res.status(200).json(deletedTenant);
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2025"
-      ) {
-        return res.status(404).json({ error: "Tenant not found" });
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
       }
-      console.error("Error deleting tenant:", error);
-      res.status(500).json({ error: "Failed to delete tenant" });
+
+      res.status(200).json(product);
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      res.status(500).json({ error: "Failed to fetch product" });
     }
   } else {
     res.status(405).json({ error: "Method not allowed" });

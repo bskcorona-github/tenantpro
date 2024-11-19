@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient,Prisma } from "@prisma/client";
 import Cors from "cors";
 
 const prisma = new PrismaClient();
@@ -7,7 +7,6 @@ const cors = Cors({
   origin: "http://localhost:3000", // フロントエンドのURLを指定
   methods: ["GET", "POST", "PUT", "DELETE"], // 必要なメソッドを追加
 });
-
 function runMiddleware(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -23,37 +22,29 @@ function runMiddleware(
   });
 }
 
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   await runMiddleware(req, res, cors);
 
-  if (req.method === "DELETE") {
-    const { id } = req.body;
-
-    // バリデーション: 必須フィールドの確認
-    if (!id) {
-      return res.status(400).json({ error: "ID is required" });
-    }
+  if (req.method === "GET") {
+    const { name, category, tenantId } = req.query;
 
     try {
-      // テナントの削除
-      const deletedTenant = await prisma.tenant.delete({
-        where: { id: Number(id) },
+      const products = await prisma.product.findMany({
+        where: {
+          ...(name && { name: { contains: String(name), mode: "insensitive" } }as Prisma.StringFilter),
+
+          ...(category && { category: String(category) }),
+          ...(tenantId && { tenantId: Number(tenantId) }),
+        },
       });
 
-      res.status(200).json(deletedTenant);
+      res.status(200).json(products);
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2025"
-      ) {
-        return res.status(404).json({ error: "Tenant not found" });
-      }
-      console.error("Error deleting tenant:", error);
-      res.status(500).json({ error: "Failed to delete tenant" });
+      console.error("Error searching products:", error);
+      res.status(500).json({ error: "Failed to search products" });
     }
   } else {
     res.status(405).json({ error: "Method not allowed" });
