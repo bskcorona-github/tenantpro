@@ -6,6 +6,7 @@ export interface User {
   email: string;
   role: string; // 例: "admin" or "user"
   createdAt: string;
+  tenants: Tenant[];
 }
 
 export const useUser = () => {
@@ -16,12 +17,19 @@ export const useUser = () => {
       const data: User[] = await $fetch(`${apiBaseUrl}/users/read`); // エンドポイントを確認
       return data;
     } catch (error: unknown) {
-      console.error("Error fetching users:", error instanceof Error ? error.message : error);
+      console.error(
+        "Error fetching users:",
+        error instanceof Error ? error.message : error
+      );
       return [];
     }
   };
 
-  const createUser = async (payload: { name: string; email: string; role: string }): Promise<User | null> => {
+  const createUser = async (payload: {
+    name: string;
+    email: string;
+    role: string;
+  }): Promise<User | null> => {
     try {
       const data: User = await $fetch(`${apiBaseUrl}/users/create`, {
         method: "POST",
@@ -34,7 +42,10 @@ export const useUser = () => {
     }
   };
 
-  const updateUser = async (id: number, payload: { name?: string; email?: string; role?: string }): Promise<User | null> => {
+  const updateUser = async (
+    id: number,
+    payload: { name?: string; email?: string; role?: string }
+  ): Promise<User | null> => {
     try {
       const data: User = await $fetch(`${apiBaseUrl}/users/update/${id}`, {
         method: "PUT",
