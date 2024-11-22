@@ -1,7 +1,7 @@
 export interface Tenant {
     id: number;
     name: string;
-    ownerId: number;
+    ownerName: string;
   }
   
   export const useTenant = () => {
@@ -17,7 +17,7 @@ export interface Tenant {
       }
     };
   
-    const createTenant = async (payload: { name: string; ownerId: number }): Promise<Tenant | null> => {
+    const createTenant = async (payload: { name: string; ownerName: string }): Promise<Tenant | null> => {
       try {
         const data: Tenant = await $fetch(`${apiBaseUrl}/tenants/create`, {
           method: "POST",
@@ -30,7 +30,7 @@ export interface Tenant {
       }
     };
   
-    const updateTenant = async (id: number, payload: { name?: string; ownerId?: number }): Promise<Tenant | null> => {
+    const updateTenant = async (id: number, payload: { name?: string; ownerName?: string }): Promise<Tenant | null> => {
       try {
         const data: Tenant = await $fetch(`${apiBaseUrl}/tenants/update`, {
           method: "PUT",

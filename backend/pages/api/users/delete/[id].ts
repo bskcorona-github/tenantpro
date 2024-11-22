@@ -31,13 +31,13 @@ export default async function handler(
   await runMiddleware(req, res, cors);
 
   if (req.method === "DELETE") {
+    const { id } = req.query; // クエリパラメータからIDを取得
+
+    if (!id) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
     try {
-      const { id } = req.body;
-
-      if (!id) {
-        return res.status(400).json({ error: "User ID is required" });
-      }
-
       // ユーザー削除
       const deletedUser = await prisma.user.delete({
         where: { id: Number(id) },
@@ -60,4 +60,3 @@ export default async function handler(
     res.status(405).json({ error: "Method not allowed" });
   }
 }
-

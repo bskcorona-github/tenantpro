@@ -1,11 +1,12 @@
 export interface Product {
-    id: number;
-    name: string;
-    price: number;
-    category: string;
-    stock: number;
-    tenantId: number;
-  }
+  id: number;
+  name: string;
+  price: number;
+  category: string;
+  stock: number;
+  tenantName: string; // テナント名を追加
+}
+
   
   export const useProduct = () => {
     const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;

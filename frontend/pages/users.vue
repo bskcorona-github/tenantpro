@@ -11,6 +11,12 @@
         placeholder="メールアドレス"
         class="input mb-2"
       />
+      <input
+    v-model="newUser.password"
+    type="password"
+    placeholder="パスワード"
+    class="input mb-2"
+  />
       <select v-model="newUser.role" class="input mb-2">
         <option value="user">ユーザー</option>
         <option value="admin">管理者</option>
@@ -34,16 +40,44 @@
           <td class="border px-4 py-2">{{ user.id }}</td>
           <td class="border px-4 py-2">{{ user.name }}</td>
           <td class="border px-4 py-2">{{ user.email }}</td>
-          <td class="border px-4 py-2">{{ user.role }}</td>
           <td class="border px-4 py-2">
-            <button @click="editUser(user)" class="btn-edit">編集</button>
-            <button @click="removeUser(user.id)" class="btn-delete">
-              削除
-            </button>
+  {{ user.role === 'admin' ? '管理者' : 'ユーザー' }}
+</td>
+          <td class="border px-4 py-2">
+            <button @click="openEditModal(user)" class="btn-edit">編集</button>
+            <button @click="removeUser(user.id)" class="btn-delete">削除</button>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <!-- 編集用モーダル -->
+    <div v-if="isModalOpen && editingUser" class="modal-overlay">
+      <div class="modal">
+        <h2 class="text-xl font-bold mb-4">ユーザー編集</h2>
+        <form @submit.prevent="saveUser">
+          <input
+            v-model="editingUser.name"
+            placeholder="名前"
+            class="input mb-2"
+          />
+          <input
+            v-model="editingUser.email"
+            type="email"
+            placeholder="メールアドレス"
+            class="input mb-2"
+          />
+          <select v-model="editingUser.role" class="input mb-2">
+            <option value="user">ユーザー</option>
+            <option value="admin">管理者</option>
+          </select>
+          <button type="submit" class="btn">保存</button>
+          <button type="button" @click="closeModal" class="btn-cancel">
+            キャンセル
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -55,34 +89,54 @@ import type { User } from "~/composables/useUsers";
 const { getUsers, createUser, updateUser, deleteUser } = useUser();
 
 const users = ref<User[]>([]);
-const newUser = ref<{ name: string; email: string; role: string }>({
+const newUser = ref<{ name: string; email: string;password:string;  role: string }>({
   name: "",
   email: "",
+  password:"",
   role: "user",
 });
+
+const isModalOpen = ref(false);
+const editingUser = ref<User | null>(null);
 
 const fetchUsers = async () => {
   users.value = await getUsers();
 };
 
 const addUser = async () => {
-  if (!newUser.value.name || !newUser.value.email) return;
+  if (!newUser.value.name || !newUser.value.email||!newUser.value.password) return;
   await createUser(newUser.value);
   await fetchUsers();
-  newUser.value = { name: "", email: "", role: "user" };
+  newUser.value = { name: "", email: "", role: "user",password:"" };
 };
 
-const editUser = (user: User) => {
-  const updatedName = prompt("名前を編集:", user.name);
-  const updatedEmail = prompt("メールアドレスを編集:", user.email);
-  const updatedRole = prompt("役割を編集 (user/admin):", user.role);
-  if (updatedName && updatedEmail && updatedRole) {
-    updateUser(user.id, {
-      name: updatedName,
-      email: updatedEmail,
-      role: updatedRole,
+const openEditModal = (user: User) => {
+  console.log("編集対象のユーザー:", user);
+  editingUser.value = { ...user };
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  editingUser.value = null;
+  isModalOpen.value = false;
+};
+
+const saveUser = async () => {
+  if (!editingUser.value) {
+    console.error("編集対象のユーザーが選択されていません");
+    return;
+  }
+
+  try {
+    await updateUser(editingUser.value.id, {
+      name: editingUser.value.name || "",
+      email: editingUser.value.email || "",
+      role: editingUser.value.role || "user",
     });
-    fetchUsers();
+    await fetchUsers();
+    closeModal();
+  } catch (error) {
+    console.error("ユーザーの更新に失敗しました:", error);
   }
 };
 
@@ -96,36 +150,4 @@ const removeUser = async (id: number) => {
 onMounted(fetchUsers);
 </script>
 
-<style>
-.input {
-  display: block;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.btn {
-  padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.btn-edit {
-  background-color: #ffc107;
-  margin-right: 5px;
-}
-.btn-delete {
-  background-color: #dc3545;
-}
-.table-auto {
-  width: 100%;
-  border-collapse: collapse;
-}
-.table-auto th,
-.table-auto td {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-}
-</style>
+

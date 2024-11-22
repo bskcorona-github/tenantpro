@@ -5,7 +5,7 @@ import Cors from "cors";
 const prisma = new PrismaClient();
 const cors = Cors({
   origin: "http://localhost:3000", // フロントエンドのURLを指定
-  methods: ["GET", "POST", "PUT", "DELETE"], // 必要なメソッドを追加
+  methods: ["GET"], // 必要なメソッドを追加
 });
 
 function runMiddleware(

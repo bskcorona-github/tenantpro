@@ -30,7 +30,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // CORS ミドルウェアを実行
   await runMiddleware(req, res, cors);
 
   if (req.method === "GET") {
@@ -42,7 +41,14 @@ export default async function handler(
         },
       });
 
-      res.status(200).json(tenants);
+      // 必要な情報だけを返す
+      const formattedTenants = tenants.map((tenant) => ({
+        id: tenant.id,
+        name: tenant.name,
+        ownerName: tenant.owner.name, // オーナー名を追加
+      }));
+
+      res.status(200).json(formattedTenants);
     } catch (error) {
       console.error("Error fetching tenants:", error);
       res.status(500).json({ error: "Failed to fetch tenants" });
@@ -51,3 +57,4 @@ export default async function handler(
     res.status(405).json({ error: "Method not allowed" });
   }
 }
+

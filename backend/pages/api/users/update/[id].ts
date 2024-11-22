@@ -3,11 +3,10 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import Cors from "cors";
 
-
 const prisma = new PrismaClient();
 const cors = Cors({
   origin: "http://localhost:3000", // フロントエンドのURLを指定
-  methods: ["GET", "POST", "PUT", "DELETE"], // 必要なメソッドを追加
+  methods: ["PUT"], // 必要なメソッドを追加
 });
 
 function runMiddleware(
@@ -25,15 +24,16 @@ function runMiddleware(
   });
 }
 
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   await runMiddleware(req, res, cors);
 
+  const { id } = req.query; // クエリパラメータからIDを取得
+
   if (req.method === "PUT") {
-    const { id, email, name, role, password, tenants } = req.body;
+    const { email, name, role, password, tenants } = req.body;
 
     // バリデーション: 必須フィールドの確認
     if (!id || (!email && !name && !role && !password && !tenants)) {
@@ -80,12 +80,10 @@ export default async function handler(
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         // Prisma 特有のエラーコード処理
         if (error.code === "P2025") {
-          // P2025: 対象が見つからない場合のエラー
           return res.status(404).json({ error: "User not found" });
         }
 
         if (error.code === "P2002") {
-          // P2002: 一意制約違反のエラー
           return res.status(409).json({ error: "Email already exists" });
         }
       }
